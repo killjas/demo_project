@@ -31,9 +31,4 @@ public class WeatherRestController {
             return new ResponseEntity<>(weatherService.getWeather(city, country), HttpStatus.OK);
         }
     }
-
-    @RequestMapping(method = RequestMethod.GET, value = "/add")
-    private void add() throws IOException {
-        weatherService.downloadWeather();
-    }
 }
