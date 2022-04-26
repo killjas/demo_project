@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -20,19 +19,19 @@ import java.util.Optional;
 public class WeatherRestController {
     @Autowired
     WeatherService weatherService;
-    //method for get weather from db
+
     @ApiOperation(value = "Получить погоду", notes = "Получить погоду по дате и названии города и страны")
     @RequestMapping(method = RequestMethod.GET, value = "/getWeather")
     private ResponseEntity<List<WeatherModel>> getWeather(@ApiParam(name = "city", value = "Название города", example = "New York", required = true) String city,
                                                           @ApiParam(name = "country", value = "Название страны", example = "USA", required = true) String country,
                                                           @ApiParam(name = "date", value = "yyyy-MM-dd", example = "2022-04-25") String date) throws IOException {
-        if(Optional.ofNullable(date).isPresent()){
+        if (Optional.ofNullable(date).isPresent()) {
             return new ResponseEntity<>(weatherService.getWeather(city, country, date), HttpStatus.OK);
-        }
-        else {
+        } else {
             return new ResponseEntity<>(weatherService.getWeather(city, country), HttpStatus.OK);
         }
     }
+
     @RequestMapping(method = RequestMethod.GET, value = "/add")
     private void add() throws IOException {
         weatherService.downloadWeather();

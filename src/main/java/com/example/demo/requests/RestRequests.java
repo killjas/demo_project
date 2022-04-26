@@ -6,23 +6,34 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
 @Component
 public class RestRequests {
-    public LatLonDTO requestForFindCity(String city) throws IOException {
+    @Value("${positionstack.key}")
+    private String positionstackKey;
+    @Value("${openweather.key}")
+    private String openweatherKey;
+    @Value("${yandex.key}")
+    private String yandexKey;
+    @Value("${weatherapi.key}")
+    private String weatherApiKey;
+
+    public LatLonDTO requestForFindCity(String cityAndCountry) throws IOException {
         String url = "http://api.positionstack.com/v1/forward";
         OkHttpClient client = new OkHttpClient();
-        HttpUrl.Builder httpBuider = HttpUrl.parse(url).newBuilder();
-        httpBuider.addQueryParameter("query", city);
-        httpBuider.addQueryParameter("access_key", "51226b95e15dfc6f76763d63f64dc31a");
+        HttpUrl.Builder httpBuider = HttpUrl
+                .parse(url)
+                .newBuilder()
+                .addQueryParameter("query", cityAndCountry)
+                .addQueryParameter("access_key", positionstackKey);
+        ;
         Request request = new Request.Builder()
                 .url(httpBuider.build())
                 .get()
-                .addHeader("X-RapidAPI-Host", "weatherbit-v1-mashape.p.rapidapi.com")
-                .addHeader("X-RapidAPI-Key", "1841d0ca9bmsh5fef73690eab59ap1d04a3jsnaa3bac5e469d")
                 .build();
 
         Response response = client.newCall(request).execute();
@@ -36,20 +47,23 @@ public class RestRequests {
                 .build();
         return latLonDTO;
     }
+
     public float requestYandexWeather(LatLonDTO latLonDTO) throws IOException {
         String url = "https://api.weather.yandex.ru/v2/forecast";
         OkHttpClient client = new OkHttpClient();
-        HttpUrl.Builder httpBuider = HttpUrl.parse(url).newBuilder();
-        httpBuider.addQueryParameter("lat", latLonDTO.getLatitude());
-        httpBuider.addQueryParameter("lon", latLonDTO.getLongitude());
-        httpBuider.addQueryParameter("lang", "en_US");
-        httpBuider.addQueryParameter("limit", "1");
-        httpBuider.addQueryParameter("hours", "false");
-        httpBuider.addQueryParameter("extra", "false");
+        HttpUrl.Builder httpBuider = HttpUrl
+                .parse(url)
+                .newBuilder()
+                .addQueryParameter("lat", latLonDTO.getLatitude())
+                .addQueryParameter("lon", latLonDTO.getLongitude())
+                .addQueryParameter("lang", "en_US")
+                .addQueryParameter("limit", "1")
+                .addQueryParameter("hours", "false")
+                .addQueryParameter("extra", "false");
         Request request = new Request.Builder()
                 .url(httpBuider.build())
                 .get()
-                .addHeader("X-Yandex-API-Key", "4de55d98-1c87-4bec-ae05-4141f3ddb106")
+                .addHeader("X-Yandex-API-Key", yandexKey)
                 .build();
 
         Response response = client.newCall(request).execute();
@@ -59,14 +73,15 @@ public class RestRequests {
         float temp = Float.parseFloat(json.getJSONObject("fact").get("temp").toString());
         return temp;
     }
+
     public float requestOpenWeatherMap(LatLonDTO latLonDTO) throws IOException {
         String url = "https://api.openweathermap.org/data/2.5/weather";
         OkHttpClient client = new OkHttpClient();
-        HttpUrl.Builder httpBuider = HttpUrl.parse(url).newBuilder();
-        httpBuider.addQueryParameter("lat", latLonDTO.getLatitude());
-        httpBuider.addQueryParameter("lon", latLonDTO.getLongitude());
-        httpBuider.addQueryParameter("appid", "c034971d9df9d6335fc1037f75eedc8b");
-        httpBuider.addQueryParameter("units", "metric");
+        HttpUrl.Builder httpBuider = HttpUrl.parse(url).newBuilder()
+                .addQueryParameter("lat", latLonDTO.getLatitude())
+                .addQueryParameter("lon", latLonDTO.getLongitude())
+                .addQueryParameter("appid", openweatherKey)
+                .addQueryParameter("units", "metric");
         Request request = new Request.Builder()
                 .url(httpBuider.build())
                 .get()
@@ -78,12 +93,13 @@ public class RestRequests {
         float temp = Float.parseFloat(json.getJSONObject("main").get("temp").toString());
         return temp;
     }
+
     public float requestWeatherAPI(LatLonDTO latLonDTO) throws IOException {
         String url = "http://api.weatherapi.com/v1/current.json";
         OkHttpClient client = new OkHttpClient();
-        HttpUrl.Builder httpBuider = HttpUrl.parse(url).newBuilder();
-        httpBuider.addQueryParameter("q", latLonDTO.getLatitude() + "," + latLonDTO.getLongitude());
-        httpBuider.addQueryParameter("key", "05510f86ae06403e8b9152004222404");
+        HttpUrl.Builder httpBuider = HttpUrl.parse(url).newBuilder()
+                .addQueryParameter("q", latLonDTO.getLatitude() + "," + latLonDTO.getLongitude())
+                .addQueryParameter("key", weatherApiKey);
         Request request = new Request.Builder()
                 .url(httpBuider.build())
                 .get()
